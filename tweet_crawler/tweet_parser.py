@@ -203,3 +203,66 @@ class Tweet:
         else:
             return "[ERROR]"
 
+
+class TwitterSearch:
+    def __init__(self, keyword, access_token, csrf_token, guest_token):
+        """
+            Args:
+                keyword: the keyword to search
+                access_token: the access token to pass the oauth
+                csrf_token: the csrf_token hidden in twitter page or cookie
+                guest_token: the guest_token is calculate by twitter server. see `tweet_fetcher.fetch_guest_token()`.
+        """
+        self.keyword = keyword
+        self.access_token = access_token
+        self.csrf_token = csrf_token
+        self.guest_token = guest_token
+
+        self.next_cursor = None
+        self.previous_cursor = None
+        
+    
+    def get_next_ids(self):
+        """get the next batch of tweet ids
+        
+        Args: None
+
+        Returns: a list of tweet id
+        """
+        entries = self.__fetch_data(cursor=self.next_cursor)
+        tweet_ids = self.__parse_data(entries)
+        return tweet_ids
+
+
+    def __fetch_data(self, cursor=None):
+        """fetch the search result
+
+        Args:
+            cursor: the cursor of the search result
+        """
+        source = tweet_fetcher.fetch_search_result(self.keyword, self.access_token, self.csrf_token, self.guest_token, cursor=cursor)
+        instructions = source["timeline"]["instructions"]
+        entries = instructions[0]["addEntries"]["entries"]
+        return entries
+        
+
+    def __parse_data(self, entries):
+        """find the tweet ids in the search result
+
+        Args:
+            entries: a json object from the result of `__fetch_data`
+
+        Returns: a list of tweet id
+        """
+        ids = []
+        for entry in entries:
+            content = entry["content"]
+            if "item" in content:
+                ids.append(content["item"]["content"]["tweet"]["id"])
+            elif "operation" in content:
+                val = content["operation"]["cursor"]["value"]
+                if "scroll" in val:
+                    self.next_cursor = val
+                elif "refresh" in val:
+                    self.previous_cursor = val
+        return ids
