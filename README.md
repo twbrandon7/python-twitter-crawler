@@ -6,12 +6,26 @@
 
 ```bash
 git clone https://github.com/twbrandon7/python-tweeter-crawler.git
+cd python-tweeter-crawler
 ```
 
-2. Install dependencies
+2. Install virtualenv
 
 ```bash
-cd python-tweeter-crawler
+pip3 install virtualenv
+virtualenv .env
+```
+
+3. Activate virtual environment
+
+```bash
+source ./.env/bin/activate # for linux
+.\.env\Script\activate.ps1 # for windows powershell
+```
+
+4. Install dependencies
+
+```bash
 pip3 install -r requirements.txt
 ```
 
