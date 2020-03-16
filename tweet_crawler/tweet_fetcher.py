@@ -227,7 +227,7 @@ def fetch_tweet(tweet_id, access_token, csrf_token, guest_token, cursor=None):
         # 'cookie': 'personalization_id="v1_lSl0sw+l4lgXZY8rmiBYqQ=="; guest_id=v1%3A158416861107452973; ct0={}; _ga=GA1.2.224857067.1584168612; _gid=GA1.2.1486957857.1584168612; _twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCFSyztdwAToMY3NyZl9p%250AZCIlNTZiODBjMzUxZjYwZjVmODFlMzA0YmFmMGY4ODBmZWU6B2lkIiVlNjUy%250AMGJlZmFjOGE5Yjg1ODE3MDNjNjBlNmZlNjQwOQ%253D%253D--c97a40633e0e0d441a1e2e70feb74a755da28237; external_referer=padhuUp37zjgzgv1mFWxJ12Ozwit7owX||8e8t2xd8A2w%3D; tfw_exp=1; gt=1238768435112194048'.format(csrf_token),
     }
 
-    params = (
+    params = [
         ('include_profile_interstitial_type', '1'),
         ('include_blocking', '1'),
         ('include_blocked_by', '1'),
@@ -250,10 +250,10 @@ def fetch_tweet(tweet_id, access_token, csrf_token, guest_token, cursor=None):
         ('send_error_codes', 'true'),
         ('simple_quoted_tweets', 'true'),
         ('ext', 'mediaStats,highlightedLabel,cameraMoment'),
-    )
+    ]
 
     if cursor is not None:
-        params += ('cursor', cursor)
+        params.append(('cursor', cursor))
 
     response = requests.get('https://api.twitter.com/2/timeline/conversation/{}.json'.format(tweet_id), headers=headers, params=params)
 

@@ -7,7 +7,7 @@ from tweet_crawler import tweet_fetcher
 TEST_DATA_FOLDER = os.path.join(os.path.dirname(__file__), '../data/')
 
 
-class TestTweetFetcger(unittest.TestCase):
+class TestTweetFetcher(unittest.TestCase):
     def test_fetch_tweeter_home_page(self):
         """
         Checking the ability to get Twitter home page
@@ -62,6 +62,15 @@ class TestTweetFetcger(unittest.TestCase):
 
         result = tweet_fetcher.fetch_tweet("1238007172786577408", access_token=access_token, csrf_token=csrf_token, guest_token=guest_token)
 
+        self.assertNotEqual(result, None)
+    
+
+    def test_fetch_tweet_with_cursor(self):
+        tweet_id = "1238007172786577408"
+        cursor = "TBwcFoDAotWMz6SuIhUCAAAYJmNvbnZlcnNhdGlvblRocmVhZC0xMjM4MDA3MzM4NzYzNTcxMjAwAAA="
+        tokens = tweet_fetcher.get_tokens()
+
+        result = tweet_fetcher.fetch_tweet(tweet_id, access_token=tokens["access_token"], csrf_token=tokens["csrf_token"], guest_token=tokens["guest_token"], cursor=cursor)
         self.assertNotEqual(result, None)
 
 
