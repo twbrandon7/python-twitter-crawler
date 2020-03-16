@@ -74,5 +74,37 @@ class TestTweetFetcher(unittest.TestCase):
         self.assertNotEqual(result, None)
 
 
+    def test_fetch_search_result(self):
+        html = tweet_fetcher.fetch_twitter_home_page()
+        main_js_url = tweet_fetcher.get_main_js_url(html)
+        main_js = tweet_fetcher.fetch_main_js(main_js_url)
+
+        access_token = tweet_fetcher.get_access_token(main_js)
+        csrf_token = tweet_fetcher.generate_csrf_token()
+
+        guest_token = tweet_fetcher.fetch_guest_token(access_token, csrf_token)
+
+        keyword = "台灣"
+        result = tweet_fetcher.fetch_search_result(keyword, access_token, csrf_token, guest_token, cursor=None)
+
+        self.assertNotEqual(result, None)
+
+    
+    def test_fetch_search_result_with_cursor(self):
+        html = tweet_fetcher.fetch_twitter_home_page()
+        main_js_url = tweet_fetcher.get_main_js_url(html)
+        main_js = tweet_fetcher.fetch_main_js(main_js_url)
+
+        access_token = tweet_fetcher.get_access_token(main_js)
+        csrf_token = tweet_fetcher.generate_csrf_token()
+
+        guest_token = tweet_fetcher.fetch_guest_token(access_token, csrf_token)
+
+        keyword = "台灣"
+        cursor = "scroll:thGAVUV0VFVBYBFoD4ip6i18ayIhIYtAESY8LrAAAB9D-AYk3S8an8AAAAFBEwbX1SlOABETJ0LFsXYAIRMmNTzVdgAhExgjcH1rADETJ0Fm6WsAIRMnQg1VawAhEyqcF5FHABETNLJwVXkAERMmzyzhQwAxEycts-VrADETJ0EhmXkAARM3Zz0ZRwAREsHXsCV0ABETH_QloX0AIRMG19GNQwABEyc8RLVpAAETJ2PB9U0AERMsWcyJfQBREysgAFV4ABETJ29juWAAAVAhUAFQAVAhUAERW0hXoVgIl6GARORVdTFQAVAAA="
+        result = tweet_fetcher.fetch_search_result(keyword, access_token, csrf_token, guest_token, cursor=cursor)
+
+        self.assertNotEqual(result, None)
+
 if __name__ == '__main__':
     unittest.main()

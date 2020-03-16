@@ -3,6 +3,7 @@ import json
 import random
 import re
 from bs4 import BeautifulSoup
+from urllib.parse import quote
 
 
 def fetch_twitter_home_page():
@@ -257,6 +258,78 @@ def fetch_tweet(tweet_id, access_token, csrf_token, guest_token, cursor=None):
 
     response = requests.get('https://api.twitter.com/2/timeline/conversation/{}.json'.format(tweet_id), headers=headers, params=params)
 
+    if response.status_code == 200:
+        return json.loads(response.text)
+    else:
+        return None
+
+
+def fetch_search_result(keyword, access_token, csrf_token, guest_token, cursor=None):
+    """Fetch search results by keyword
+
+
+    Args:
+        keyword: the keyword to search
+        access_token: the access token to pass the oauth
+        csrf_token: the csrf_token hidden in twitter page or cookie
+        cursor: getting more response tweet start from this cursor
+
+    Returns: 
+        the json object return from twitter server (which is parsed as a python dictionary).
+        if the request is faild, return None.
+
+    """
+    headers = {
+        'authority': 'api.twitter.com',
+        'x-twitter-client-language': 'zh-tw',
+        'x-csrf-token': csrf_token,
+        'authorization': 'Bearer {}'.format(access_token),
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+        'sec-fetch-dest': 'empty',
+        'x-guest-token': guest_token,
+        'x-twitter-active-user': 'yes',
+        'accept': '*/*',
+        'origin': 'https://twitter.com',
+        'sec-fetch-site': 'same-site',
+        'sec-fetch-mode': 'cors',
+        'referer': 'https://twitter.com/search?q={}&src=typed_query'.format(quote(keyword)),
+        'accept-language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6,ja;q=0.5',
+    }
+
+    params = [
+        ('include_profile_interstitial_type', '1'),
+        ('include_blocking', '1'),
+        ('include_blocked_by', '1'),
+        ('include_followed_by', '1'),
+        ('include_want_retweets', '1'),
+        ('include_mute_edge', '1'),
+        ('include_can_dm', '1'),
+        ('include_can_media_tag', '1'),
+        ('skip_status', '1'),
+        ('cards_platform', 'Web-12'),
+        ('include_cards', '1'),
+        ('include_composer_source', 'true'),
+        ('include_ext_alt_text', 'true'),
+        ('include_reply_count', '1'),
+        ('tweet_mode', 'extended'),
+        ('include_entities', 'true'),
+        ('include_user_entities', 'true'),
+        ('include_ext_media_color', 'true'),
+        ('include_ext_media_availability', 'true'),
+        ('send_error_codes', 'true'),
+        ('simple_quoted_tweets', 'true'),
+        ('q', keyword),
+        ('count', '20'),
+        ('query_source', 'typed_query'),
+        ('pc', '1'),
+        ('spelling_corrections', '1'),
+        ('ext', 'mediaStats,highlightedLabel,cameraMoment'),
+    ]
+
+    if params is not None:
+        params.append(('cursor', cursor))
+
+    response = requests.get('https://api.twitter.com/2/search/adaptive.json', headers=headers, params=params)
     if response.status_code == 200:
         return json.loads(response.text)
     else:
