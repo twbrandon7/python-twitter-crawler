@@ -21,8 +21,7 @@ class TestTweetObject(unittest.TestCase):
         tokens = get_tokens()
         tweet = Tweet(tweet_id, access_token=tokens["access_token"], csrf_token=tokens["csrf_token"], guest_token=tokens["guest_token"])
         out = tweet.get_tweets()
-        json_str = json.dumps(out)
-        self.assertNotEqual(json_str, None)
+        self.assertEqual(out["tweet"], "TWEEEET!")
 
     def test_get_tweets_with_bound(self):
         tweet_id = "1238007172786577408"
