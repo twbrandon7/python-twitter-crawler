@@ -30,13 +30,13 @@ class Tweet:
         }
 
 
-    def get_tweets(self, max_response=-1, timeline_length=-1):
+    def get_tweets(self, max_timelines=-1, timeline_length=-1):
         """getting tweet including it's timeline (the responses of a response)
         
 
         Args:
-            max_timeline: the maximum response of the main tweet to get. set -1 to download all responses.
-            timeline_length: the maximun response in a timeline. -1 to get the whole timeline.
+            max_timelines: the maximum responses (timelines) of the main tweet to get. set -1 to download all responses.
+            timeline_length: the maximun length of a timeline. -1 to get the whole timeline.
 
         Returns: a dictionary. for example:
             {
@@ -50,18 +50,25 @@ class Tweet:
         """
 
         self.__init_output()
-        self.__parse_entries(entries=self.entries, max_response=max_response, timeline_length=timeline_length)
+        self.__parse_entries(entries=self.entries, max_timelines=max_timelines, timeline_length=timeline_length)
 
-        if max_response != -1:
-            self.output["timelines"] = self.output["timelines"][:max_response]
+        if max_timelines != -1:
+            self.output["timelines"] = self.output["timelines"][:max_timelines]
 
         return self.output
 
 
-    def __parse_entries(self, entries, max_response=-1, timeline_length=-1):
+    def __parse_entries(self, entries, max_timelines=-1, timeline_length=-1):
+        """parse entries from the json object of twitter
+
+        Args:
+            entries: a json object which contains all responses
+            max_timelines: the maximum responses to get
+            timeline_length: the maximum length of a timeline
+        """
         responses_count = 0
         for entry in entries:
-            if max_response == 0:
+            if max_timelines == 0:
                 break
             content = entry["content"]
             if "item" in content:
@@ -70,18 +77,27 @@ class Tweet:
                 self.process_timeline_module(content, timeline_length=timeline_length)
                 responses_count += 1
             elif "operation" in content:
-                if max_response != -1:
-                    _max_response = max_response - responses_count
-                    if _max_response < 0:
-                        _max_response = 0
+                if max_timelines != -1:
+                    _max_timelines = max_timelines - responses_count
+                    if _max_timelines < 0:
+                        _max_timelines = 0
                 else:
-                    _max_response = -1
-                self.process_operation(content, max_response=_max_response, timeline_length=timeline_length)
+                    _max_timelines = -1
+                self.process_operation(content, max_timelines=_max_timelines, timeline_length=timeline_length)
             else:
                 print("Not defined")
 
 
     def process_timeline_module(self, content, timeline_length=-1):
+        """extract timeline from the json object of twitter
+
+
+        Args:
+            content: json object which contains several "items"
+            timeline_length: the maximum length of a timeline
+
+        Returns: None
+        """
         items = content["timelineModule"]["items"]
         final_timeline = []
         
@@ -143,11 +159,20 @@ class Tweet:
         return timeline, next_cursor
 
 
-    def process_operation(self, content, max_response=-1, timeline_length=-1):
+    def process_operation(self, content, max_timelines=-1, timeline_length=-1):
+        """getting more timeline
+
+        Args:
+            content: the json object which contains the cursor of next batch of timelines
+            max_timelines: see `__parse_entries()`
+            timeline_length: see `__parse_entries()`
+        
+        Returns: None
+        """
         cursor = content["operation"]["cursor"]
         value = cursor["value"]
         new_tweets = Tweet(self.tweet_id, self.access_token, self.csrf_token, self.guest_token, cursor=value)
-        out = new_tweets.get_tweets(max_response=max_response, timeline_length=timeline_length)
+        out = new_tweets.get_tweets(max_timelines=max_timelines, timeline_length=timeline_length)
         self.output["timelines"] += out["timelines"]
 
 
