@@ -27,7 +27,7 @@ class TestTweetObject(unittest.TestCase):
         tweet_id = "1238007172786577408"
         tokens = get_tokens()
         tweet = Tweet(tweet_id, access_token=tokens["access_token"], csrf_token=tokens["csrf_token"], guest_token=tokens["guest_token"])
-        out = tweet.get_tweets(max_response=10, timeline_length=2)
+        out = tweet.get_tweets(max_timelines=10, timeline_length=2)
         self.assertEqual(len(out["timelines"]), 10)
 
     def test_constructor_with_cursor(self):
