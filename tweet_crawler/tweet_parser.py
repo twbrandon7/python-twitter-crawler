@@ -8,13 +8,21 @@ class Tweet:
         """
             Args:
                 tweet_id: the id of the target tweet
+                access_token: the access token to pass the oauth
+                csrf_token: the csrf_token hidden in twitter page or cookie
+                guest_token: the guest_token is calculate by twitter server. see `tweet_fetcher.fetch_guest_token()`.
         """
         self.tweet_id = tweet_id
         self.access_token = access_token
         self.csrf_token = csrf_token
         self.guest_token = guest_token
+        self.cursor = cursor
 
-        self.source = tweet_fetcher.fetch_tweet(tweet_id, access_token, csrf_token, guest_token, cursor=cursor)
+        self.is_first = True
+
+
+    def __prepare(self):
+        self.source = tweet_fetcher.fetch_tweet(self.tweet_id, self.access_token, self.csrf_token, self.guest_token, cursor=self.cursor)
 
         self.tweets = self.source["globalObjects"]["tweets"]
         self.instructions = self.source["timeline"]["instructions"]
@@ -48,6 +56,10 @@ class Tweet:
                 ]
             }
         """
+
+        if self.is_first:
+            self.__prepare()
+            self.is_first = False
 
         self.__init_output()
         self.__parse_entries(entries=self.entries, max_timelines=max_timelines, timeline_length=timeline_length)
