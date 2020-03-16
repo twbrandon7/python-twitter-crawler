@@ -202,6 +202,7 @@ def fetch_tweet(tweet_id, access_token, csrf_token, guest_token, cursor=None):
         tweet_id: the target tweet id
         access_token: the access token to pass the oauth
         csrf_token: the csrf_token hidden in twitter page or cookie
+        guest_token: the guest_token is calculate by twitter server. see `fetch_guest_token()`.
         cursor: getting more response tweet start from this cursor
 
     Returns: 
