@@ -34,6 +34,6 @@ pip3 install -r requirements.txt
 ### Unit test
 
 ```bash
-python -m unittest tests.unit.test_Tweet_object.test_tweet_fetcher
-python -m unittest tests.unit.test_Tweet_object.TestTweetObject
+python -m unittest tests.unit.test_tweet_fetcher
+python -m unittest tests.unit.test_Tweet_object
 ```
