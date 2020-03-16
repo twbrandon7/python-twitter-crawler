@@ -8,11 +8,11 @@ TEST_DATA_FOLDER = os.path.join(os.path.dirname(__file__), '../data/')
 
 
 class TestTweetFetcher(unittest.TestCase):
-    def test_fetch_tweeter_home_page(self):
+    def test_fetch_twitter_home_page(self):
         """
         Checking the ability to get Twitter home page
         """
-        html = tweet_fetcher.fetch_tweeter_home_page()
+        html = tweet_fetcher.fetch_twitter_home_page()
         self.assertNotEqual(html, None)
 
 
@@ -51,7 +51,7 @@ class TestTweetFetcher(unittest.TestCase):
 
 
     def test_fetch_tweet(self):
-        html = tweet_fetcher.fetch_tweeter_home_page()
+        html = tweet_fetcher.fetch_twitter_home_page()
         main_js_url = tweet_fetcher.get_main_js_url(html)
         main_js = tweet_fetcher.fetch_main_js(main_js_url)
 

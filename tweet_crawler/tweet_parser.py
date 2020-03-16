@@ -122,7 +122,7 @@ class Tweet:
 
 
         Args:
-            items: the items object from tweeter
+            items: the items object from twitter
 
         Returns:
             timeline: the array of multiple timeline text
@@ -155,7 +155,7 @@ class Tweet:
         """getting the text of the tweet
         
         Args:
-            content: the "content" object from the response of tweeter
+            content: the "content" object from the response of twitter
 
         Returns: the text of the tweet (string)
         """

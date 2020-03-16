@@ -5,7 +5,7 @@ import re
 from bs4 import BeautifulSoup
 
 
-def fetch_tweeter_home_page():
+def fetch_twitter_home_page():
     """get the twitter home page
 
     Args: None
@@ -178,7 +178,7 @@ def get_tokens():
             "guest_token": "123......"
         }
     """
-    html = fetch_tweeter_home_page()
+    html = fetch_twitter_home_page()
     main_js_url = get_main_js_url(html)
     main_js = fetch_main_js(main_js_url)
 
