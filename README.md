@@ -1,12 +1,12 @@
-# Simple Tweeter crawler written in Python
+# Simple Twitter crawler written in Python
 
 ## Installation
 
 1. Download the project
 
 ```bash
-git clone https://github.com/twbrandon7/python-tweeter-crawler.git
-cd python-tweeter-crawler
+git clone https://github.com/twbrandon7/python-twitter-crawler.git
+cd python-twitter-crawler
 ```
 
 2. Install virtualenv
