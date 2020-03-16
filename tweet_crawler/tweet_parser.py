@@ -76,7 +76,6 @@ class Tweet:
                         _max_response = 0
                 else:
                     _max_response = -1
-                print("STACK")
                 self.process_operation(content, max_response=_max_response, timeline_length=timeline_length)
             else:
                 print("Not defined")

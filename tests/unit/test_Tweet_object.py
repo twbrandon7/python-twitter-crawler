@@ -17,22 +17,19 @@ class TestTweetObject(unittest.TestCase):
         self.assertTrue(len(tweet.entries) > 0)
     
     def test_get_tweets(self):
-        tweet_id = "1238007172786577408"
+        tweet_id = "1239125355866099712"
         tokens = get_tokens()
         tweet = Tweet(tweet_id, access_token=tokens["access_token"], csrf_token=tokens["csrf_token"], guest_token=tokens["guest_token"])
         out = tweet.get_tweets()
         json_str = json.dumps(out)
-        print(json_str)
-        self.assertTrue(True)
+        self.assertNotEqual(json_str, None)
 
     def test_get_tweets_with_bound(self):
         tweet_id = "1238007172786577408"
         tokens = get_tokens()
         tweet = Tweet(tweet_id, access_token=tokens["access_token"], csrf_token=tokens["csrf_token"], guest_token=tokens["guest_token"])
         out = tweet.get_tweets(max_response=10, timeline_length=2)
-        json_str = json.dumps(out)
-        print(json_str)
-        self.assertTrue(True)
+        self.assertEqual(len(out["timelines"]), 10)
 
     def test_constructor_with_cursor(self):
         tweet_id = "1238007172786577408"
