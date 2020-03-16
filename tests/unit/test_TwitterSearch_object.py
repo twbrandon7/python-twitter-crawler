@@ -5,7 +5,7 @@ from tweet_crawler.tweet_fetcher import get_tokens
 
 import json
 
-class TestTweetSearchObject(unittest.TestCase):
+class TestTwitterSearchObject(unittest.TestCase):
 
     def test_get_next_ids(self):
         keyword = "spacex"
