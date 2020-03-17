@@ -75,7 +75,8 @@ class CrawlerManager:
             print("Running threads: {}, Buffer ids: {}".format(len(self.__running_threads), len(self.id_buffer)), end="\r")
 
             if self.max_result != -1 and self.fetched_ids >= self.max_result and len(self.__running_threads) == 0:
-                logger.info("All tasks have been completed.")
+                logger.info("All tasks have been completed. Exit.")
+                self.stop()
                 break
 
 
