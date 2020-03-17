@@ -13,6 +13,19 @@ from tweet_crawler.storages.json_storage import JsonStorage
 class CrawlerManager:
     
     def __init__(self, keyword, storage, max_result=-1, max_thread=3, sleep_duration=0.5, max_timelines=-1, timeline_length=-1, token_refresh_duration=300):
+        """A twitter crawler based on searching result
+
+
+        Args:
+            keyword: the keyword to search.
+            storage: the storage method. see `tweet_crawler.storages.frameword`. for now, only `json_storage` is implemented.
+            max_result: the maximum result to search. set -1 for infinity.
+            max_thread: the maximum tweet-downloading thread to execute.
+            sleep_duration: the cooldown for each request in a thread.
+            max_timelines: the maximum timelines (responses) of a tweet to download. set -1 to download the whole timelines.
+            timeline_length: the maximum response of a timeline to download. set -1 for infinity. set -1 to download the whole responses.
+            token_refresh_duration: the time duration in seconds to refresh the access tokens.
+        """
         self.keyword = keyword
         self.storage = storage
         self.max_result = max_result
@@ -36,6 +49,13 @@ class CrawlerManager:
 
 
     def refresh_token(self, force=False):
+        """refresh access tokens
+
+        Args:
+            force: ignore `self.token_refresh_duration` to force update the tokens.
+        
+        Returns: None
+        """
         if force or self.last_token_refresh is None or time.time() - self.last_token_refresh >= self.token_refresh_duration:
             logger.info("Start refresh tokens")
             self.tokens = tweet_fetcher.get_tokens()
@@ -44,6 +64,13 @@ class CrawlerManager:
 
 
     def start(self):
+        """start the crawler
+
+
+        Args: None
+
+        Returns: None
+        """
         logger.info("Start searching for '{}'".format(self.keyword))
         self.refresh_token()
         self.search = TwitterSearch(self.keyword, self.tokens["access_token"], self.tokens["csrf_token"], self.tokens["guest_token"])
@@ -57,6 +84,13 @@ class CrawlerManager:
 
 
     def stop(self):
+        """stop the crawler
+
+
+        Args: None
+
+        Returns: None
+        """
         logger.info("Stopping...")
         self.run = False
         self.__thread_fetch_ids.join()
@@ -67,6 +101,17 @@ class CrawlerManager:
 
 
     def __thread_manager(self):
+        """automatically create new threads to download a tweet
+
+
+        This method will consume IDs in the `self.id_buffer`.
+        After a ID is consumed, a new thread will created to download
+        a tweet based on the ID.
+
+        Args: None
+
+        Returns: None
+        """
         while self.run:
             if len(self.__running_threads) < self.max_thread and len(self.id_buffer) > 0:
                 tweet_id = self.id_buffer.pop(0)
@@ -83,6 +128,12 @@ class CrawlerManager:
 
 
     def __search_ids(self):
+        """searching tweets and get tweet id by keyword
+
+        Args: None
+
+        Returns: None
+        """
         while self.run:
             if self.max_result != -1 and self.fetched_ids >= self.max_result:
                 logger.info("Reached max_result. Stop searching.")
@@ -94,6 +145,13 @@ class CrawlerManager:
         
 
     def __fetch_ids(self):
+        """search and append the result tweet id to `self.id_buffer`
+
+
+        Args: None
+
+        Returns: None
+        """
         self.refresh_token()
         if len(self.id_buffer) <= self.max_thread:
             ids = self.search.get_next_ids()
@@ -107,6 +165,16 @@ class CrawlerManager:
 
 
     def __download_twitter(self, tweet_id):
+        """download a single tweet and it's timelines (responses) by tweet id
+
+
+        the downloaded data will be stored by following `self.storage`
+
+        Args:
+            tweet_id: the tweet_id of a tweet to download
+
+        Returns: None
+        """
         logger.info("Start download tweet {}.".format(tweet_id))
         tweet = Tweet(
             tweet_id=tweet_id,
