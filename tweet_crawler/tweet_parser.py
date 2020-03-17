@@ -34,6 +34,7 @@ class Tweet:
     def __init_output(self):
         self.output = {
             "tweet": "",
+            "tweet_id": self.tweet_id,
             "timelines": []
         }
 
@@ -49,6 +50,7 @@ class Tweet:
         Returns: a dictionary. for example:
             {
                 "tweet": "the main tweet",
+                "tweet_id": "the_tweet_id",
                 "timelines": [
                     ["response 1", "response 1-1", "response 1-2", ...... ],
                     ["response 2", "response 2-1", "response 2-2", ...... ],
