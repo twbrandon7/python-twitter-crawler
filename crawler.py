@@ -2,6 +2,7 @@ import time
 import threading
 import signal
 import sys
+import argparse
 
 from tweet_crawler import logger
 from tweet_crawler import tweet_fetcher
@@ -43,6 +44,7 @@ class CrawlerManager:
 
 
     def start(self):
+        logger.info("Start searching for '{}'".format(self.keyword))
         self.refresh_token()
         self.search = TwitterSearch(self.keyword, self.tokens["access_token"], self.tokens["csrf_token"], self.tokens["guest_token"])
 
@@ -74,9 +76,9 @@ class CrawlerManager:
             
             print("Running threads: {}, Buffer ids: {}".format(len(self.__running_threads), len(self.id_buffer)), end="\r")
 
-            if self.max_result != -1 and self.fetched_ids >= self.max_result and len(self.__running_threads) == 0:
+            if self.max_result != -1 and self.fetched_ids >= self.max_result and len(self.__running_threads) == 0 and len(self.id_buffer) == 0:
                 logger.info("All tasks have been completed. Exit.")
-                self.stop()
+                self.run = False
                 break
 
 
@@ -134,18 +136,26 @@ class CrawlerManager:
             
 
 if __name__ == '__main__':
-    keyword = "spacex"
-    output_folder = "./data"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("keyword", help="The keyword to search")
+    parser.add_argument("-f", "--folder", help="The folder to save the tweets. The default folder is './data'", default="./data", type=str)
+    parser.add_argument("-mr", "--max_result", help="The maximum amount of tweets to download. Default is 10. Set -1 for unlimiting.", default=10, type=int)
+    parser.add_argument("-mt", "--max_thread", help="The maximum amount of threads to run. Default is 1.", default=1, type=int)
+    parser.add_argument("-sd", "--sleep_duration", help="The time between each request for each thread.", default=1, type=int)
+    parser.add_argument("-mtl", "--max_timelines", help="The maximum amount of timelines (responses) to download for each tweet. Set -1 for unlimiting. Default is -1.", default=-1, type=int)
+    parser.add_argument("-tl", "--timeline_length", help="The maximum length of a timeline to download. Set -1 for unlimiting. Default is -1.", default=-1, type=int)
+    parser.add_argument("-trd", "--token_refresh_duration", help="The time duration in seconds to refresh the access tokens. Default is 300 seconds.", default=300, type=int)
+    args = parser.parse_args()
 
     mgr = CrawlerManager(
-        keyword="台灣",
-        storage=JsonStorage(output_folder),
-        max_result=10,
-        max_thread=3,
-        sleep_duration=2,
-        max_timelines=-1,
-        timeline_length=-1,
-        token_refresh_duration=300
+        keyword=args.keyword,
+        storage=JsonStorage(args.folder),
+        max_result=args.max_result,
+        max_thread=args.max_thread,
+        sleep_duration=args.sleep_duration,
+        max_timelines=args.max_timelines,
+        timeline_length=args.timeline_length,
+        token_refresh_duration=args.token_refresh_duration
     )
     mgr.start()
     
