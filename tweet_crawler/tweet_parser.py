@@ -17,8 +17,11 @@ class Tweet:
         self.csrf_token = csrf_token
         self.guest_token = guest_token
         self.cursor = cursor
+        self.__next_cursor = None
 
-        self.is_first = True
+        self.entries = None
+
+        self.__is_first = True
 
 
     def __prepare(self):
@@ -26,7 +29,15 @@ class Tweet:
 
         self.tweets = self.source["globalObjects"]["tweets"]
         self.instructions = self.source["timeline"]["instructions"]
-        self.entries = self.instructions[0]["addEntries"]["entries"]
+
+        instruction = None
+        for instruction in self.instructions:
+            if "addEntries" in instruction:
+                break
+        
+        if instruction is not None:
+            self.entries = self.instructions[0]["addEntries"]["entries"]
+
         self.output = {}
         self.__init_output()
 
@@ -39,12 +50,15 @@ class Tweet:
         }
 
 
-    def get_tweets(self, max_timelines=-1, timeline_length=-1):
-        """getting tweet including it's timeline (the responses of a response)
+    def get_next_cursor(self):
+        return self.__next_cursor
+
+
+    def get_main_tweet(self, timeline_length=-1):
+        """get the tweet and it's first timelines
         
 
         Args:
-            max_timelines: the maximum responses (timelines) of the main tweet to get. set -1 to download all responses.
             timeline_length: the maximun length of a timeline. -1 to get the whole timeline.
 
         Returns: a dictionary. for example:
@@ -59,31 +73,52 @@ class Tweet:
             }
         """
 
-        if self.is_first:
+        if self.__is_first:
             self.__prepare()
-            self.is_first = False
+            self.__is_first = False
 
         self.__init_output()
-        self.__parse_entries(entries=self.entries, max_timelines=max_timelines, timeline_length=timeline_length)
-
-        if max_timelines != -1:
-            self.output["timelines"] = self.output["timelines"][:max_timelines]
+        if self.entries is not None:
+            self.__parse_entries(entries=self.entries, timeline_length=timeline_length)
 
         return self.output
 
 
-    def __parse_entries(self, entries, max_timelines=-1, timeline_length=-1):
+    def get_next_timelines(self, timeline_length=-1):
+        """get the tweet and it's first timelines
+        
+
+        Args:
+            timeline_length: the maximun length of a timeline. -1 to get the whole timeline.
+
+        Returns: a list of timelines. for example:
+            [
+                ["response 1", "response 1-1", "response 1-2", ...... ],
+                ["response 2", "response 2-1", "response 2-2", ...... ],
+                ......
+            ]
+
+            Return None if `self.__next_cursor` is None.
+        """
+        
+        if self.__next_cursor is None:
+            return None
+        else:
+            new_tweets = Tweet(self.tweet_id, self.access_token, self.csrf_token, self.guest_token, cursor=self.__next_cursor)
+            out = new_tweets.get_main_tweet(timeline_length=timeline_length)
+            self.__next_cursor = new_tweets.get_next_cursor()
+            return out["timelines"]
+
+
+    def __parse_entries(self, entries, timeline_length=-1):
         """parse entries from the json object of twitter
 
         Args:
             entries: a json object which contains all responses
-            max_timelines: the maximum responses to get
             timeline_length: the maximum length of a timeline
         """
         responses_count = 0
         for entry in entries:
-            if max_timelines == 0:
-                break
             content = entry["content"]
             if "item" in content:
                 self.output["tweet"] = self.__get_tweet_text(content["item"]["content"])
@@ -91,13 +126,7 @@ class Tweet:
                 self.process_timeline_module(content, timeline_length=timeline_length)
                 responses_count += 1
             elif "operation" in content:
-                if max_timelines != -1:
-                    _max_timelines = max_timelines - responses_count
-                    if _max_timelines < 0:
-                        _max_timelines = 0
-                else:
-                    _max_timelines = -1
-                self.process_operation(content, max_timelines=_max_timelines, timeline_length=timeline_length)
+                self.process_operation(content)
             else:
                 print("Not defined")
 
@@ -173,21 +202,17 @@ class Tweet:
         return timeline, next_cursor
 
 
-    def process_operation(self, content, max_timelines=-1, timeline_length=-1):
+    def process_operation(self, content):
         """getting more timeline
 
         Args:
             content: the json object which contains the cursor of next batch of timelines
-            max_timelines: see `__parse_entries()`
-            timeline_length: see `__parse_entries()`
         
         Returns: None
         """
         cursor = content["operation"]["cursor"]
         value = cursor["value"]
-        new_tweets = Tweet(self.tweet_id, self.access_token, self.csrf_token, self.guest_token, cursor=value)
-        out = new_tweets.get_tweets(max_timelines=max_timelines, timeline_length=timeline_length)
-        self.output["timelines"] += out["timelines"]
+        self.__next_cursor = value
 
 
     def __get_tweet_text(self, content):
