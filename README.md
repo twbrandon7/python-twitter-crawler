@@ -67,6 +67,13 @@ optional arguments:
                         tokens. Default is 300 seconds.
 ```
 
+### Examples
+
+```bash
+python crawler.py "spacex" -mr 5 -mt 5
+python crawler.py "spacex" -mr 5 -mt 5 -th 3
+```
+
 ## Development
 
 It is welcome to contribute to this project by creating a [pull request](https://github.com/twbrandon7/python-twitter-crawler/pulls). There are several things that need for accomplishment.
