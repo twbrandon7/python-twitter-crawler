@@ -69,6 +69,13 @@ optional arguments:
 
 ## Development
 
+It is welcome to contribute to this project by creating [pull request](https://github.com/twbrandon7/python-twitter-crawler/pulls). There are several things that need for accomplishment.
+
+### TODO
+
+- [ ] Add time information to the downloaded tweet.
+- [ ] Add more storage class. (See `tweet_crawler.storages`.)
+
 ### Unit test
 
 ```bash
