@@ -29,6 +29,44 @@ source ./.env/bin/activate # for linux
 pip3 install -r requirements.txt
 ```
 
+## Usage
+
+It is fine to use the crawler in command line. The explanation of the command is as following:
+
+```bash
+$ python crawler.py -h
+usage: crawler.py [-h] [-f FOLDER] [-mr MAX_RESULT] [-thd MAX_THREAD]
+                  [-sd SLEEP_DURATION] [-mt MAX_TIMELINES]
+                  [-tl TIMELINE_LENGTH] [-trd TOKEN_REFRESH_DURATION]
+                  keyword
+
+positional arguments:
+  keyword               The keyword to search
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FOLDER, --folder FOLDER
+                        The folder to save the tweets. The default folder is
+                        './data'
+  -mr MAX_RESULT, --max_result MAX_RESULT
+                        The maximum amount of tweets to download. Default is
+                        10. Set -1 for unlimiting.
+  -thd MAX_THREAD, --max_thread MAX_THREAD
+                        The maximum amount of threads to run. Default is 1.
+  -sd SLEEP_DURATION, --sleep_duration SLEEP_DURATION
+                        The time between each request for each thread.
+  -mt MAX_TIMELINES, --max_timelines MAX_TIMELINES
+                        The maximum amount of timelines (responses) to
+                        download for each tweet. Set -1 for unlimiting.
+                        Default is -1.
+  -tl TIMELINE_LENGTH, --timeline_length TIMELINE_LENGTH
+                        The maximum length of a timeline to download. Set -1
+                        for unlimiting. Default is -1.
+  -trd TOKEN_REFRESH_DURATION, --token_refresh_duration TOKEN_REFRESH_DURATION
+                        The time duration in seconds to refresh the access
+                        tokens. Default is 300 seconds.
+```
+
 ## Development
 
 ### Unit test
