@@ -37,4 +37,5 @@ pip3 install -r requirements.txt
 python -m unittest tests.unit.test_tweet_fetcher
 python -m unittest tests.unit.test_Tweet_object
 python -m unittest tests.unit.test_TwitterSearch_object
+python -m unittest tests.unit.storages.test_json_storage
 ```
