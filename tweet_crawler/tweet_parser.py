@@ -1,4 +1,5 @@
 from tweet_crawler import tweet_fetcher
+from tweet_crawler import logger
 
 class Tweet:
     """The object that represent a tweet and it's responses
@@ -172,8 +173,18 @@ class Tweet:
         self.tweets.update(obj["globalObjects"]["tweets"])
 
         instructions = obj["timeline"]["instructions"]
-        items = instructions[0]["addToModule"]["moduleItems"]
-        return self.__parse_timeline_items(items)
+
+        instruction = None
+        for instruction in instructions:
+            if "addToModule" in instruction:
+                break
+        
+        if instruction is not None:
+            items = instructions[0]["addToModule"]["moduleItems"]
+            return self.__parse_timeline_items(items)
+        else:
+            logger.debug("at 'tweet_parser.Tweet.__fetch_data_with_cursor' len(instructions) == 0. DUMP:\n{}".format(obj))
+            return [], None
 
 
     def __parse_timeline_items(self, items):
@@ -223,11 +234,15 @@ class Tweet:
 
         Returns: the text of the tweet (string)
         """
+        if "tweet" not in content:
+            logger.debug("at 'tweet_parser.Tweet.__get_tweet_text' 'tweet' not in content. DUMP:\n{}".format(content))
+            return "[ERROR]"
         tweet_id = content["tweet"]["id"]
         if tweet_id in self.tweets:
             tweet = self.tweets[tweet_id]
             return tweet["full_text"]
         else:
+            logger.debug("at 'tweet_parser.Tweet.__get_tweet_text' the text of 'tweet_id' not found. DUMP:\n{}".format(content))
             return "[ERROR]"
 
 
