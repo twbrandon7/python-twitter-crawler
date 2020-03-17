@@ -1,3 +1,4 @@
 local/
 .env/
 **/__pycache__/
+logs/
