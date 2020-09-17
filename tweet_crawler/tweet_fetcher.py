@@ -93,7 +93,8 @@ def get_access_token(main_js):
 
     Returns: the access token. return None if not found
     """
-    pattern = re.compile(",s=\"(AAAA.+?)\",c=")
+    # pattern = re.compile(",s=\"(AAAA.+?)\",c=")
+    pattern = re.compile("=\s*\"(AAAA.+?)\"\s*,")
     result = pattern.search(main_js)
     if len(result.groups()) == 1:
         return result.group(1)
